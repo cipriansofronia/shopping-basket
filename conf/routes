@@ -1,0 +1,11 @@
+# Routes
+
+GET           /shoppingbasket/catalog               ro.levi9.shoppingbasket.controllers.MainController.listCatalog
+
+POST          /shoppingbasket/create                ro.levi9.shoppingbasket.controllers.MainController.createBasket
+
+GET           /shoppingbasket/list                  ro.levi9.shoppingbasket.controllers.MainController.listBasket
+
+POST          /shoppingbasket/update/:itemId        ro.levi9.shoppingbasket.controllers.MainController.addItemToBasket(itemId: String)
+
+DELETE        /shoppingbasket/update/:itemId        ro.levi9.shoppingbasket.controllers.MainController.deleteItemFromBasket(itemId: String)
