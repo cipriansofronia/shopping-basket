@@ -10,18 +10,18 @@ class CatalogActor extends Actor {
   private val catalog = List(
     CatalogItem(Item("id123", "OnePlus3", "OnePlus", "phones", "the latest OnePlus smart phone", 1600), 2),
     CatalogItem(Item("id124", "OnePlus5", "OnePlus", "phones", "the latest OnePlus smart phone", 2500), 10),
-    CatalogItem(Item("id125", "Iphone8", "Apple", "phones", "the latest OnePlus smart phone", 9998), 3),
-    CatalogItem(Item("id126", "IphoneX", "Apple", "phones", "the latest OnePlus smart phone", 9999), 4)
+    CatalogItem(Item("id125", "Iphone8", "Apple", "phones", "the latest Apple smart phone", 9998), 3),
+    CatalogItem(Item("id126", "IphoneX", "Apple", "phones", "the latest Apple smart phone", 9999), 4)
   )
 
   def receive: Receive = update(catalog.map(i => i.item.id -> i).toMap)
 
   private def update(catalog: Map[String, CatalogItem]): Receive = {
-    case DecreaseStockFor(itemId) =>
-      catalog.get(itemId) match {
+    case DecreaseStockFor(itemDTO) =>
+      catalog.get(itemDTO.itemId) match {
         case Some(item) =>
-          if (item.stock > 0) {
-            val updatedCatalog = catalog + (itemId -> item.copy(stock = item.stock - 1))
+          if (item.stock >= itemDTO.amount) {
+            val updatedCatalog = catalog + (itemDTO.itemId -> item.copy(stock = item.stock - itemDTO.amount))
             context become update(updatedCatalog)
             sender ! ItemStockUpdated
           }
@@ -31,10 +31,10 @@ class CatalogActor extends Actor {
         case None => sender ! ItemNotFound
       }
 
-    case IncreaseStockFor(itemId) =>
-      catalog.get(itemId) match {
+    case IncreaseStockFor(basketItem) =>
+      catalog.get(basketItem.itemId) match {
         case Some(item) =>
-          val updatedCatalog = catalog + (itemId -> item.copy(stock = item.stock + 1))
+          val updatedCatalog = catalog + (basketItem.itemId -> item.copy(stock = item.stock + basketItem.amount))
           context become update(updatedCatalog)
           sender ! ItemStockUpdated
 

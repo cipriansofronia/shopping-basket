@@ -8,8 +8,8 @@ import akka.util.Timeout
 import play.api.Configuration
 import ro.levi9.shoppingbasket.actors.messages.BasketMessage._
 import ro.levi9.shoppingbasket.actors.messages.CatalogMessage
-import ro.levi9.shoppingbasket.actors.messages.CatalogMessage.{DecreaseStockFor, IncreaseStockFor, GetItems}
-import ro.levi9.shoppingbasket.dto.BasketDTO
+import ro.levi9.shoppingbasket.actors.messages.CatalogMessage.{DecreaseStockFor, GetItems, IncreaseStockFor}
+import ro.levi9.shoppingbasket.dto.{BasketDTO, UpdateItemDTO}
 import ro.levi9.shoppingbasket.models.CatalogItem
 import ro.levi9.shoppingbasket.services.responses.BasketServiceError.{InsufficientStockError, MissingBasketError, MissingItemError, UnexpectedMessageError}
 import ro.levi9.shoppingbasket.services.responses.{BasketServiceError, BasketServiceResponse}
@@ -44,12 +44,12 @@ class BasketService @Inject() (@Named("basketActor") basketActor: ActorRef,
       case _ => Future.successful(Left(UnexpectedMessageError))
     }
 
-  def add(basketId: String, itemId: String): Future[Either[BasketServiceError, BasketServiceResponse]] =
+  def add(basketId: String, itemDTO: UpdateItemDTO): Future[Either[BasketServiceError, BasketServiceResponse]] =
     (basketActor ? GetBasket(basketId)).flatMap {
       case BasketFound(_) =>
-        (catalogActor ? DecreaseStockFor(itemId)).flatMap {
+        (catalogActor ? DecreaseStockFor(itemDTO)).flatMap {
           case CatalogMessage.ItemStockUpdated =>
-            (basketActor ? AddToBasket(basketId, itemId)).map {
+            (basketActor ? AddToBasket(basketId, itemDTO)).map {
               case BasketItemAdded => Right(BasketServiceSuccess)
               case _ => Left(UnexpectedMessageError)
             }
@@ -61,8 +61,8 @@ class BasketService @Inject() (@Named("basketActor") basketActor: ActorRef,
 
   def remove(basketId: String, itemId: String): Future[Either[BasketServiceError, BasketServiceResponse]] =
     (basketActor ? DeleteFromBasket(basketId, itemId)).flatMap {
-      case BasketItemRemoved =>
-        (catalogActor ? IncreaseStockFor(itemId)).map {
+      case BasketItemRemoved(basketItem) =>
+        (catalogActor ? IncreaseStockFor(basketItem)).map {
           case CatalogMessage.ItemStockUpdated => Right(BasketServiceSuccess)
           case CatalogMessage.ItemNotFound => Left(MissingItemError)
         }

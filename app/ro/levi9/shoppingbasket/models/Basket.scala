@@ -2,7 +2,7 @@ package ro.levi9.shoppingbasket.models
 
 case class Basket(items: Set[BasketItem]) {
 
-  def updateItem(itemId: String, amount: Int): Set[BasketItem] =
+  def addOrUpdateItem(itemId: String, amount: Int): Set[BasketItem] =
     getBasketItem(itemId) match {
       case Some(basketItem) =>
         deleteItem(basketItem) ++ {
@@ -14,7 +14,7 @@ case class Basket(items: Set[BasketItem]) {
         items ++ Set(BasketItem(itemId, amount))
     }
 
-  private def deleteItem(basketItem: BasketItem): Set[BasketItem] =
+  def deleteItem(basketItem: BasketItem): Set[BasketItem] =
     items.filterNot(_.itemId == basketItem.itemId)
 
   def getBasketItem(itemId: String): Option[BasketItem] = items.find(_.itemId == itemId)

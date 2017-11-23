@@ -27,10 +27,10 @@ class BasketActor extends Actor {
       }
 
 
-    case AddToBasket(basketId, itemId) =>
+    case AddToBasket(basketId, itemDTO) =>
       basket.get(basketId) match {
         case Some(foundBasket) =>
-          val updatedBasket = basket + (basketId -> Basket(foundBasket.updateItem(itemId, 1)))
+          val updatedBasket = basket + (basketId -> Basket(foundBasket.addOrUpdateItem(itemDTO.itemId, itemDTO.amount)))
           context become update(updatedBasket)
           sender ! BasketItemAdded
 
@@ -43,10 +43,10 @@ class BasketActor extends Actor {
       basket.get(basketId) match {
         case Some(foundBasket) =>
           foundBasket.getBasketItem(itemId) match {
-            case Some(_) =>
-              val updatedBasket = basket + (basketId -> Basket(foundBasket.updateItem(itemId, -1)))
+            case Some(basketItem) =>
+              val updatedBasket = basket + (basketId -> Basket(foundBasket.deleteItem(basketItem)))
               context become update(updatedBasket)
-              sender ! BasketItemRemoved
+              sender ! BasketItemRemoved(basketItem)
 
             case None =>
               sender ! BasketItemNotFound
