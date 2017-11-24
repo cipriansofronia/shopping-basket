@@ -59,7 +59,7 @@ class MainController @Inject()(cc: ControllerComponents,
   }
 
   private def addToBasket(basketId: String, item: UpdateItemDTO): Future[Result] =
-    basketService.add(basketId, item.abs).map {
+    basketService.add(basketId, item).map {
       case Right(BasketServiceSuccess) => Created.withHeaders(BasketIdHeader -> basketId)
       case Left(MissingItemError) => NotFound(Json.toJson(ErrorDTO(MissingItemError.message)))
       case Left(MissingBasketError) => NotFound(Json.toJson(ErrorDTO(MissingBasketError.message)))
