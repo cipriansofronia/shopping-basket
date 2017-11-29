@@ -74,7 +74,7 @@ class MainControllerSpec extends PlaySpec
         .withHeaders(BasketHeaderKey -> BasketHeaderValue)
 
       val result = call(controller.addItemToBasket, req)
-      assert(status(result) == CREATED)
+      assert(status(result) == OK)
     }
 
 
