@@ -15,8 +15,8 @@ class AppModule extends Module {
 
     val actorSystem: ActorSystem = ActorSystem("shopping-basket")
 
-    val catalogActor = actorSystem.actorOf(Props(new CatalogActor()))
-    val basketActor = actorSystem.actorOf(Props(new BasketActor()))
+    val catalogActor = actorSystem.actorOf(Props[CatalogActor])
+    val basketActor = actorSystem.actorOf(Props[BasketActor])
 
     Seq(
       bind[ActorRef].qualifiedWith("catalogActor").toInstance(catalogActor),
