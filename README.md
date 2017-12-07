@@ -1,6 +1,4 @@
-[![Build Status](https://travis-ci.org/cipriansofronia/shopping-basket.svg?branch=master)](https://travis-ci.org/cipriansofronia/shopping-basket)
-
-## shopping-basket
+## shopping-basket  [![Build Status](https://travis-ci.org/cipriansofronia/shopping-basket.svg?branch=master)](https://travis-ci.org/cipriansofronia/shopping-basket)
 
 Small REST shopping-basket API built in scala with [Play Framework](https://www.playframework.com/) and [Akka](http://akka.io/)
 
